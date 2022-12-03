@@ -1,0 +1,24 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'jacoco'
+    id 'kotlin-kapt'
+}
+
+apply from: "$rootDir/build-system/app/test-report.gradle"
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    // Image loading
+    implementation "com.github.bumptech.glide:glide:$glide_version"
+    implementation "androidx.appcompat:appcompat:$appcompat_version"
+    kapt "com.github.bumptech.glide:compiler:$glide_version"
+}

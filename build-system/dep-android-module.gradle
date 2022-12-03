@@ -1,0 +1,91 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+project.ext.codeCoverage = [
+        "enabled"      : true
+]
+jacocoTestReport {
+    dependsOn test // tests are required to run before generating the report
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                    "com/moladin/di/*"
+            ])
+        }))
+    }
+}
+androidExtensions {
+    experimental = true
+}
+
+android {
+    compileSdkVersion project.ext.compileSdkVersion
+    buildToolsVersion project.ext.buildToolsVersion
+
+    defaultConfig {
+        minSdkVersion project.ext.minSdkVersion
+        targetSdkVersion project.ext.targetSdkVersion
+        versionCode 1
+        versionName "3.0.0"
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+        // todo : move `uiTest` folder to `androidTest` when the pipeline ready to run instrumentation test
+        test.java.srcDirs += 'src/uiTest/kotlin'
+        androidTest.java.srcDirs += 'src/androidTest/kotlin'
+    }
+
+    buildTypes {
+        release {
+            debuggable buildDebuggable()
+        }
+
+        integration {
+            debuggable buildDebuggable()
+        }
+
+        debug {
+            minifyEnabled false
+            debuggable buildDebuggable()
+        }
+    }
+
+    testOptions {
+        unitTests.includeAndroidResources = true
+        unitTests.returnDefaultValues = true
+        unitTests.all {
+            jvmArgs '-noverify'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+
+        kotlinOptions {
+            freeCompilerArgs = ["-Xinline-classes"]
+        }
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+
+    lintOptions {
+        abortOnError !isCi()
+        xmlReport true
+        textReport false
+        htmlReport true
+        xmlOutput file("$rootDir/$project.name-lint-results.xml")
+    }
+}
+
+dependencies {
+    implementation jetbrains.kotlin
+}

@@ -1,0 +1,45 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'jacoco'
+    id 'kotlin-kapt'
+}
+
+apply from: "$rootDir/build-system/app/test-report.gradle"
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+    }
+    buildTypes {
+        debug {
+            buildConfigField "String", "BASE_URL", "\"https://reqres.in/\""
+        }
+        release {
+            buildConfigField "String", "BASE_URL", "\"https://reqres.in/\""
+        }
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+}
+
+dependencies {
+    // Networking
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-moshi:$retrofit_version"
+    implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
+
+    // Dependency injection
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    kapt "com.google.dagger:hilt-compiler:$hilt_version"
+
+    //Testing
+    testImplementation "org.mockito:mockito-core:$mockito_version_kotlin"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:$mockito_version_kotlin"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
+    testImplementation "com.squareup.okhttp3:mockwebserver:$mock_server_version"
+}

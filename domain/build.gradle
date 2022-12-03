@@ -1,0 +1,35 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'dagger.hilt.android.plugin'
+    id 'jacoco'
+    id 'kotlin-kapt'
+}
+
+
+apply from: "$rootDir/build-system/app/test-report.gradle"
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    implementation project(':data')
+
+    // Dependency injection
+    implementation "com.google.dagger:hilt-android:$hilt_version"
+    testImplementation 'junit:junit:4.12'
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+
+    //Paging
+    implementation "androidx.paging:paging-common-ktx:$paging_version"
+
+    //Network
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+}
