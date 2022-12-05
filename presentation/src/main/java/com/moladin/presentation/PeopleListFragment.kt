@@ -8,7 +8,10 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.LoadState
 import com.moladin.presentation.databinding.FragmentPeopleListBinding
+import com.moladin.ui_common.ui.makeGone
+import com.moladin.ui_common.ui.makeVisible
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -28,9 +31,7 @@ class PeopleListFragment : Fragment(R.layout.fragment_people_list) {
 
         _binding = FragmentPeopleListBinding.bind(view)
 
-        peopleListAdapter = PeoplePagingAdapter()
-        binding.peopleList.adapter = peopleListAdapter
-
+        setUpRecyclerView()
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -42,8 +43,30 @@ class PeopleListFragment : Fragment(R.layout.fragment_people_list) {
     }
 
     private fun setUpRecyclerView() {
-        binding.peopleList.apply {
-            adapter = PeoplePagingAdapter()
+        peopleListAdapter = PeoplePagingAdapter()
+        binding.peopleList.adapter = peopleListAdapter
+        binding.btnRefresh.setOnClickListener {
+            peopleListAdapter.retry()
+        }
+
+        peopleListAdapter.addLoadStateListener { loadState ->
+            when (loadState.refresh) {
+                is LoadState.NotLoading -> {
+                    binding.tvError.makeGone()
+                    binding.btnRefresh.makeGone()
+                    binding.progress.makeGone()
+                }
+                LoadState.Loading -> {
+                    binding.tvError.makeGone()
+                    binding.btnRefresh.makeGone()
+                    binding.progress.makeVisible()
+                }
+                is LoadState.Error -> {
+                    binding.tvError.makeVisible()
+                    binding.btnRefresh.makeVisible()
+                    binding.progress.makeGone()
+                }
+            }
         }
     }
 

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">presentation</string>
+    <string name="retry">Refresh</string>
+    <string name="error">Something went wrong</string>
 </resources>
