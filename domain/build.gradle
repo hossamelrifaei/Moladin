@@ -32,4 +32,10 @@ dependencies {
 
     //Network
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+
+    //Testing
+    testImplementation "org.mockito:mockito-core:$mockito_version_kotlin"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:$mockito_version_kotlin"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
+    testImplementation "com.squareup.okhttp3:mockwebserver:$mock_server_version"
 }
