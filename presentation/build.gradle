@@ -42,7 +42,6 @@ dependencies {
     implementation "androidx.paging:paging-runtime:$paging_version"
 
     //Testing
-    testImplementation "org.mockito:mockito-core:$mockito_version_kotlin"
     testImplementation "org.mockito.kotlin:mockito-kotlin:$mockito_version_kotlin"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines_version"
     testImplementation 'junit:junit:4.13.2'
