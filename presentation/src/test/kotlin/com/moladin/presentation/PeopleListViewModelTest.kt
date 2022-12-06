@@ -1,6 +1,7 @@
 package com.moladin.presentation
 
 import androidx.paging.AsyncPagingDataDiffer
+import androidx.paging.LoadState
 import androidx.paging.PagingSource
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
@@ -9,6 +10,7 @@ import com.moladin.domain.model.PeopleEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -18,10 +20,9 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -78,6 +79,37 @@ class PeopleListViewModelTest {
 
     }
 
+    /**Should set loading state to notloading when the refresh is not loading*/
+    @Test
+    fun onAdapterLoadStateChangedWhenRefreshIsNotLoadingThenSetLoadingStateToNotLoading() =
+        runTest {
+            val viewModel = PeopleListViewModel(mock())
+            viewModel.onAdapterLoadStateChanged(LoadState.NotLoading(true))
+            val result = viewModel.loadingState.first()
+
+            assertTrue((result is PeopleListViewModel.STATE.NOTLOADING))
+        }
+
+    /**Should set loading state to loading when the refresh is loading*/
+    @Test
+    fun onAdapterLoadStateChangedWhenRefreshIsLoadingThenSetLoadingStateToLoading() = runTest {
+        val viewModel = PeopleListViewModel(mock())
+        viewModel.onAdapterLoadStateChanged(LoadState.Loading)
+        val result = viewModel.loadingState.first()
+
+        assertTrue((result is PeopleListViewModel.STATE.LOADING))
+    }
+
+    /**Should set loading state to error when the refresh is error*/
+    @Test
+    fun onAdapterLoadStateChangedWhenRefreshIsErrorThenSetLoadingStateToError() = runTest {
+
+        val viewModel = PeopleListViewModel(mock())
+        viewModel.onAdapterLoadStateChanged(LoadState.Error(mock()))
+        val result = viewModel.loadingState.first()
+        assertTrue((result is PeopleListViewModel.STATE.ERROR))
+    }
+
     private fun expectedWithPeople(): List<PeopleEntity.Data> {
         return listOf(
             PeopleEntity.Data(
@@ -99,7 +131,10 @@ class PeopleListViewModelTest {
     }
 
     class MyDiffCallback : DiffUtil.ItemCallback<PeopleEntity.Data>() {
-        override fun areItemsTheSame(oldItem: PeopleEntity.Data, newItem: PeopleEntity.Data): Boolean {
+        override fun areItemsTheSame(
+            oldItem: PeopleEntity.Data,
+            newItem: PeopleEntity.Data
+        ): Boolean {
             return oldItem == newItem
         }
 
